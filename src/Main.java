@@ -9,8 +9,9 @@ public class Main {
 	
 	public static void main(String[] args){
 		Driver driver = new Driver(mm_size, sim_step);
-		TestFileCreator creator = new TestFileCreator(mm_size, sim_step);
-		creator.createTestFiles();
-//		driver.runSimulation();
+//		TestFileCreator creator = new TestFileCreator(mm_size, sim_step);
+//		creator.createTestFiles();
+		driver.parseFile();
+		driver.runSimulation();
 	}
 }

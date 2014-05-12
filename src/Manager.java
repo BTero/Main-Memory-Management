@@ -115,11 +115,29 @@ public class Manager {
 
 	}
 
-	public boolean checkLeft(){
-		return false;
+//	public boolean checkLeft(){
+//		return false;
+//	}
+//
+//	public boolean checkRight(){
+//		return false;
+//	}
+	
+	public void setStrat(int strat){
+		this.STRATEGY = strat;
 	}
-
-	public boolean checkRight(){
-		return false;
+	
+	public void reset(int strat){
+		setStrat(strat);
+		for(int i = 1; i < mm.length; i++){			
+			mm[i] = 0;
+		}
+		// allocating size of usable memory and pointers
+		mm[0] = (mm.length - 4) * -1;					// size
+		mm[mm.length - 1] = (mm.length - 4) * -1;		// size
+		mm[1] = mm.length - 1;							// predecessor pointer
+		mm[mm.length - 2] = 0;							// successor pointer
+		
+		list.clear();
 	}
 }
