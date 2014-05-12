@@ -5,9 +5,12 @@ public class Main {
 	private static String uciNetID = "BTero";
 	
 	private static int mm_size = 10000;
+	private static int sim_step = 10000;
 	
 	public static void main(String[] args){
-		Driver d = new Driver(mm_size);
-		d.runSimulation();
+		Driver driver = new Driver(mm_size, sim_step);
+		TestFileCreator creator = new TestFileCreator(mm_size, sim_step);
+		creator.createTestFiles();
+//		driver.runSimulation();
 	}
 }
