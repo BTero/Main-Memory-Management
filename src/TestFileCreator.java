@@ -11,7 +11,7 @@ public class TestFileCreator {
 	private static String studentID = "90121402";
 	private static String uciNetID = "BTero";
 
-	private static FileOutputStream outFile;
+//	private static FileOutputStream outFile;
 	private static PrintStream fileData;
 	private static File file;
 
@@ -28,7 +28,6 @@ public class TestFileCreator {
 	public void createTestFiles(){
 		int count = 0;
 		double  a, d;
-		double high, low;
 		r = new Random();
 		for(int i = 0; i < 4; i++){
 			try{
@@ -36,22 +35,16 @@ public class TestFileCreator {
 				if(!file.exists()){
 					fileData = new PrintStream(file);
 					if(count <= 1){
-						double mid_point = mm_size / 2;
-						low = mid_point - 100;
+						a = mm_size / 2;
 						d = (3.0 / 10.0) * mm_size;
-						a = r.nextInt(200) + (int)low;
 						createSizes(a, d);
 					}else if(count == 2){
-						double quarter_point = mm_size / 4;
-						low = quarter_point - 100;
+						a = mm_size / 4;
 						d = (3.0 / 10.0) * mm_size;
-						a = r.nextInt(200) + (int)low;
 						createSizes(a, d);
 					}else if(count == 3){
-						double point = (mm_size * 3) / 4;
-						low = point - 100;
+						a = (mm_size * 3) / 4;
 						d = (3.0 / 10.0) * mm_size;
-						a = r.nextInt(200) + (int)low;
 						createSizes(a, d);
 					}
 					count++;
@@ -65,9 +58,8 @@ public class TestFileCreator {
 	}
 
 	public void createSizes(double a, double d){
-		for(int i = 0; i < sim_step; i++){
+		for(int i = 0; i < 1000; i++){
 			double n = r.nextGaussian();
-
 			int value = (int) (n * d + a);
 			if(value > mm_size - 4 ){
 				i--;
