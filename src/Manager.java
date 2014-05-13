@@ -1,4 +1,5 @@
 import java.util.LinkedList;
+import java.util.Random;
 
 public class Manager {
 
@@ -6,7 +7,7 @@ public class Manager {
 	private static String studentID = "90121402";
 	private static String uciNetID = "BTero";
 
-	
+
 	private class Block{
 		private int size;				// negative size represents a hole of that size | a positive size represents a occupied block of that size
 		private int start;
@@ -17,15 +18,29 @@ public class Manager {
 			this.size = size;
 			this.end = end;
 		}
+
+		public int getStart(){
+			return this.start;
+		}
+
+		public int getEnd(){
+			return this.end;
+		}
+
+		public int getSize(){
+			return this.size;
+		}
 	}
 
 	private int STRATEGY;		// Strategy = 0 - first fit | Strategy = 1 - Best fit
 	private int mm[];
+	private int mm_size;
 	private LinkedList<Block> list;
 	private int total_size = 0;
 
 	public Manager(int strat, int mm_size){
 		this.STRATEGY = strat;
+		this.mm_size = mm_size;
 		mm = new int[mm_size];
 		list = new LinkedList<Block>();
 
@@ -52,21 +67,39 @@ public class Manager {
 		do{
 			index = search(STRATEGY, start);
 			if(index == -1){
-				return found;
-			}
+				return false;
+			}//System.out.println(index);
 			int hole_size = mm[index] * -1;
-			if(size <= hole_size){						// request size is allocatable
+			if(size + 4 <= hole_size){						// request size is allocatable
 				int end = index + size + 3;
 				mm[index] = size;						// set size in left tag
 				mm[end] = size;			// set size in right tag
-				mm[index + 1] = index - 1;				// set predecessor's pointer to previous block
-				mm[index + size + 2] = end + 1;	// set successor's pointer to next block ( in this case the hole)
+				if(index == 0){
+					mm[index + 1] = mm_size - 1;
+				}else{
+					mm[index + 1] = index - 1;				// set predecessor's pointer to previous block
+				}
+
+				if(index + size + 2 > mm_size - 1){
+					int diff = index + size + 2 - mm_size;
+					mm[diff] = diff + 2;
+				}else{
+					mm[index + size + 2] = end + 1;	// set successor's pointer to next block ( in this case the hole)
+				}
+				int new_size = hole_size - size - 4;
+				mm[end + 1] = new_size * -1;
+				mm[end + 2] = end;
+				mm[new_size + end + 4] = new_size * -1;
 				total_size += size;
 				Block b = new Block(index, size, end);
 				list.add(b);
 				found = true;
 			}else{
-				index = search(STRATEGY, index + hole_size + 4);
+				start = index + hole_size + 4;
+				index = search(STRATEGY, start);
+				//				if(index + hole_size + 4 > mm.length){
+				//					return found;
+				//				}
 			}
 		}while(!found);
 
@@ -108,25 +141,79 @@ public class Manager {
 		}else if(strat == 1){						// best-fit allocation
 
 		}
-		return 0;
+		return -1;
 	}
 
-	public void release(int index){
+	public void release(){
+		Random r = new Random();
+		if(list.size() != 0){
+			int block_index = r.nextInt(list.size());
+			Block b = list.get(block_index);
+			int block_start = b.getStart();
+			int block_size = b.getSize();
+			int block_end = b.getEnd();
+			if(list.size() == 1){
+				for(int i = 0; i < mm.length; i++){
+					mm[i] = 0;
+				}
+				mm[0] = (mm.length - 4) * -1;					// size
+				mm[mm.length - 1] = (mm.length - 4) * -1;		// size
+				mm[1] = mm.length - 1;							// predecessor pointer
+				mm[mm.length - 2] = 0;							// successor pointer
+			}else{
+				if(mm[mm[block_start + 1]] < 0){
+					int left_end = mm[block_start + 1];
+					int left_hole_size = mm[left_end] * -1;
+					int left_start = left_end - left_hole_size - 3;
+					if(left_start < 0){
+						left_start = mm_size - left_hole_size - 3 + left_end;
+					}
+					int new_size = left_hole_size + block_size + 1;
+					if(new_size <= 9996){
+						mm[left_start] = new_size * -1;
+					}
+					mm[left_end] = 0;
+					mm[left_end - 1] = 0;
+					mm[block_start] = 0;
+					mm[block_start + 1] = 0;
+					mm[block_end] = new_size * -1;
 
+				}
+				if(mm[mm[block_end - 1]] < 0){
+					int right_start = block_end + 1;
+					int right_hole_size = mm[block_end + 1] * -1;
+					int right_end = right_start + right_hole_size + 3;
+					if(right_end > 9996){
+						right_end -= mm_size;
+					}
+					int new_size = right_hole_size + block_size + 3;
+					if(new_size <= mm_size){
+						mm[right_end] = new_size * -1;
+					}
+					mm[right_start] = 0;
+					mm[right_start + 1] = 0;
+					mm[block_end] = 0;
+					mm[block_end - 1] = 0;
+					mm[right_end] = new_size * -1;
+				}
+			}
+			list.remove(block_index);
+			total_size -= block_size;
+		}
 	}
 
-//	public boolean checkLeft(){
-//		return false;
-//	}
-//
-//	public boolean checkRight(){
-//		return false;
-//	}
-	
 	public void setStrat(int strat){
 		this.STRATEGY = strat;
 	}
 	
+	public double getMemoryUtilization(){
+		return (double) this.total_size / (double)this.mm_size;
+	}
+	
+	public double getAverageSearchTime(){
+		return 0;
+	}
+
 	public void reset(int strat){
 		setStrat(strat);
 		for(int i = 1; i < mm.length; i++){			
@@ -137,7 +224,7 @@ public class Manager {
 		mm[mm.length - 1] = (mm.length - 4) * -1;		// size
 		mm[1] = mm.length - 1;							// predecessor pointer
 		mm[mm.length - 2] = 0;							// successor pointer
-		
+
 		list.clear();
 	}
 }

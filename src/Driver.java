@@ -35,12 +35,20 @@ public class Driver {
 	
 	public void runSimulation(){
 		boolean success= false;
+		int counter = 0;
 		for(int i = 0; i < sim_step; i++){
 			do{
-				int size = data[i];
-				success = m.request(size);
-			}while(success == true);
-			System.out.println("failure " + i);
+				if(counter == mm_size){
+					return;
+				}else{
+					int size = data[counter];
+					success = m.request(size);
+					System.out.println(success);
+				}
+				counter++;
+			}while(success);
+			
+			m.release();
 		}
 		
 		// repeat simulation with a different strategy

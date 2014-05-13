@@ -67,16 +67,16 @@ public class TestFileCreator {
 	public void createSizes(double a, double d){
 		for(int i = 0; i < sim_step; i++){
 			double n = r.nextGaussian();
-			if(n > 0){
-				int value = (int) (n * d + a);
-				if(value > mm_size - 4){
-					i--;
-				}else{
-					fileData.println(value);
-				}
-			}else{
+
+			int value = (int) (n * d + a);
+			if(value > mm_size - 4 ){
 				i--;
+			}else if(value < 0){
+				i--;
+			}else{
+				fileData.println(value);
 			}
+
 
 		}
 	}
